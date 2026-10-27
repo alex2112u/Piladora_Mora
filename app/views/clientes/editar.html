@@ -1,1 +1,8 @@
-<!-- editar.html - pendiente de implementar -->
+{% extends "layouts/base.html" %}
+{% block titulo %}Editar cliente - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<h1>Editar cliente</h1>
+{% set cancelar_url = url_for('clientes.detalle', id=cliente.id) %}
+{% include "clientes/_form.html" %}
+{% endblock %}

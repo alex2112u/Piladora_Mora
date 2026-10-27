@@ -1,0 +1,24 @@
+<form method="post" class="formulario">
+  <label>Nombre *</label>
+  <input type="text" name="nombre" value="{{ datos.get('nombre') or '' }}" required autofocus>
+
+  <label>Documento (cédula o RUC)</label>
+  <input type="text" name="documento" value="{{ datos.get('documento') or '' }}">
+
+  <label>Teléfono</label>
+  <input type="text" name="telefono" value="{{ datos.get('telefono') or '' }}">
+
+  <label>Correo</label>
+  <input type="email" name="email" value="{{ datos.get('email') or '' }}">
+
+  <label>Dirección</label>
+  <input type="text" name="direccion" value="{{ datos.get('direccion') or '' }}">
+
+  <label>Límite de crédito</label>
+  <input type="text" name="limite_credito" value="{{ datos.get('limite_credito', '0') }}">
+
+  <div class="acciones">
+    <button type="submit" class="boton">Guardar</button>
+    <a class="boton gris" href="{{ cancelar_url }}">Cancelar</a>
+  </div>
+</form>

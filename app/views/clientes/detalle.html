@@ -1,1 +1,45 @@
 <!-- detalle.html - pendiente de implementar -->
+{% extends "layouts/base.html" %}
+{% block titulo %}{{ cliente.nombre }} - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>{{ cliente.nombre }}
+    {% if not cliente.activo %}<span class="badge off">Inactivo</span>{% endif %}
+  </h1>
+  <div class="acciones">
+    <a class="boton" href="{{ url_for('clientes.editar', id=cliente.id) }}">Editar</a>
+    <form method="post" action="{{ url_for('clientes.cambiar_estado', id=cliente.id) }}">
+      <button type="submit" class="boton gris">
+        {{ 'Desactivar' if cliente.activo else 'Activar' }}
+      </button>
+    </form>
+  </div>
+</div>
+
+<div class="tarjetas">
+  <div class="tarjeta">
+    <small>Sacos guardados en bodega</small>
+    <strong>{{ '%.2f'|format(sacos) }}</strong>
+  </div>
+  <div class="tarjeta">
+    <small>Saldo pendiente de cobro</small>
+    <strong>$ {{ '%.2f'|format(deuda) }}</strong>
+  </div>
+  <div class="tarjeta">
+    <small>Límite de crédito</small>
+    <strong>$ {{ '%.2f'|format(cliente.limite_credito or 0) }}</strong>
+  </div>
+</div>
+
+<table class="tabla datos">
+  <tr><th>Documento</th><td>{{ cliente.documento or '—' }}</td></tr>
+  <tr><th>Teléfono</th><td>{{ cliente.telefono or '—' }}</td></tr>
+  <tr><th>Correo</th><td>{{ cliente.email or '—' }}</td></tr>
+  <tr><th>Dirección</th><td>{{ cliente.direccion or '—' }}</td></tr>
+  <tr><th>Registrado</th>
+      <td>{{ cliente.creado_en.strftime('%d/%m/%Y %H:%M') if cliente.creado_en else '—' }}</td></tr>
+</table>
+
+<p><a href="{{ url_for('clientes.index') }}">← Volver al listado</a></p>
+{% endblock %}
