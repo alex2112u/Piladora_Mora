@@ -1,0 +1,14 @@
+<aside class="sidebar">
+  <h2>🌾 Piladora</h2>
+  <nav>
+    <a href="{{ url_for('dashboard.index') }}">Inicio</a>
+    <!-- Aquí iremos agregando: Clientes, Bodega, Pilado, Cobros -->
+  </nav>
+  <div class="usuario">
+    <strong>{{ current_user.nombre }}</strong>
+    <small>{{ current_user.rol.nombre if current_user.rol else '' }}</small>
+    <form method="post" action="{{ url_for('auth.logout') }}">
+      <button type="submit">Cerrar sesión</button>
+    </form>
+  </div>
+</aside>

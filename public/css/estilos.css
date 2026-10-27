@@ -1,0 +1,23 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, Arial, sans-serif; background: #f4f5f0; color: #222; }
+
+.app { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; background: #2f4a2f; color: #fff; padding: 20px; display: flex; flex-direction: column; }
+.sidebar h2 { margin-top: 0; }
+.sidebar nav { flex: 1; }
+.sidebar nav a { display: block; color: #fff; text-decoration: none; padding: 10px 8px; border-radius: 6px; }
+.sidebar nav a:hover { background: rgba(255,255,255,.15); }
+.sidebar .usuario small { display: block; opacity: .75; margin-bottom: 10px; }
+.sidebar button { width: 100%; padding: 8px; border: 0; border-radius: 6px; cursor: pointer; }
+.contenido { flex: 1; padding: 30px; }
+
+.alerta { padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; }
+.alerta.error { background: #fde2e2; color: #8a1f1f; }
+.alerta.ok { background: #dff3df; color: #1f5a1f; }
+.alerta.message { background: #fff4d6; color: #6b5200; }
+
+.login-caja { max-width: 360px; margin: 10vh auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,.1); }
+.login-caja h1 { margin: 0 0 4px; }
+.login-caja label { display: block; margin-top: 14px; font-size: 14px; }
+.login-caja input { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 6px; }
+.login-caja button { width: 100%; margin-top: 20px; padding: 11px; background: #2f4a2f; color: #fff; border: 0; border-radius: 6px; font-size: 15px; cursor: pointer; }

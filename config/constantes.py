@@ -1,0 +1,1 @@
+"""constantes - pendiente de implementar."""
