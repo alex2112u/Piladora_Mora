@@ -26,6 +26,9 @@ def create_app():
 
     from routes.auth_routes import auth_bp
     from routes.dashboard_routes import dashboard_bp
+    from routes.bodega_routes import bodega_bp 
+    
+    app.register_blueprint(bodega_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
     from routes.cliente_routes import clientes_bp

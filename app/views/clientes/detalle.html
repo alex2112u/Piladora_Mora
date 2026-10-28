@@ -41,5 +41,6 @@
       <td>{{ cliente.creado_en.strftime('%d/%m/%Y %H:%M') if cliente.creado_en else '—' }}</td></tr>
 </table>
 
+<a class="boton" href="{{ url_for('bodega.historial', id=cliente.id) }}">Ver bodega</a>
 <p><a href="{{ url_for('clientes.index') }}">← Volver al listado</a></p>
 {% endblock %}

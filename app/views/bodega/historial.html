@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Historial de bodega - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Bodega: {{ cliente.nombre }}</h1>
+  <a class="boton" href="{{ url_for('bodega.registrar', cliente_id=cliente.id) }}">
+    + Registrar movimiento
+  </a>
+</div>
+
+<p>Saldo actual: <strong>{{ saldo }} sacos</strong></p>
+
+<table class="tabla">
+  <thead>
+    <tr>
+      <th>Fecha y hora</th><th>Tipo</th><th>Sacos</th>
+      <th>Saldo después</th><th>Registró</th><th>Observaciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for m, acumulado in filas %}
+    <tr>
+      <td>{{ m.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+      <td>
+        <span class="badge {{ 'entrada' if m.tipo == 'ENTRADA' else 'salida' }}">
+          {{ m.motivo or m.tipo }}
+        </span>
+      </td>
+      <td>{{ m.cantidad|int }}</td>
+      <td>{{ acumulado }}</td>
+      <td>{{ m.usuario.nombre if m.usuario else '' }}</td>
+      <td>{{ m.observaciones or '' }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">Este cliente aún no tiene movimientos.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

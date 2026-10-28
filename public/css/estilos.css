@@ -54,3 +54,6 @@ body { margin: 0; font-family: system-ui, Arial, sans-serif; background: #f4f5f0
 .tarjeta { flex: 1; min-width: 180px; background: #fff; padding: 16px; border-radius: 8px; }
 .tarjeta small { display: block; color: #666; }
 .tarjeta strong { font-size: 24px; }
+
+.badge.entrada { background: #dcfce7; color: #166534; }
+.badge.salida  { background: #fee2e2; color: #991b1b; }

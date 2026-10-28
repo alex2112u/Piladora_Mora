@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Registrar movimiento - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Registrar depósito o retiro</h1>
+  <a class="boton" href="{{ url_for('bodega.index') }}">Volver</a>
+</div>
+
+<form method="post" class="formulario">
+  <label>Cliente</label>
+  <select name="cliente_id" required>
+    <option value="">— Selecciona un cliente —</option>
+    {% for cliente, sacos in clientes %}
+    <option value="{{ cliente.id }}"
+      {% if datos.get('cliente_id')|string == cliente.id|string %}selected{% endif %}>
+      {{ cliente.nombre }} ({{ sacos }} sacos guardados)
+    </option>
+    {% endfor %}
+  </select>
+
+  <label>Tipo de movimiento</label>
+  <div>
+    <label>
+      <input type="radio" name="motivo" value="DEPOSITO"
+        {% if datos.get('motivo', 'DEPOSITO') == 'DEPOSITO' %}checked{% endif %}>
+      Depósito (el cliente deja arroz)
+    </label>
+    <label>
+      <input type="radio" name="motivo" value="RETIRO"
+        {% if datos.get('motivo') == 'RETIRO' %}checked{% endif %}>
+      Retiro (el cliente se lleva arroz)
+    </label>
+  </div>
+
+  <label>Cantidad de sacos</label>
+  <input type="number" name="sacos" min="1" step="1" required
+         value="{{ datos.get('sacos', '') }}">
+
+  <label>Observaciones (opcional)</label>
+  <input type="text" name="observaciones" maxlength="255"
+         value="{{ datos.get('observaciones', '') }}">
+
+  <button type="submit" class="boton">Guardar</button>
+</form>
+{% endblock %}
