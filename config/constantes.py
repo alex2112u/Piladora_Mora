@@ -25,3 +25,5 @@ ETIQUETA_COBRO_CORTA = {
     "saco": "saco",
     "saco_mes": "saco por mes",
 }
+
+NOMBRE_NEGOCIO = "Piladora"  # cámbialo por el nombre real de tu piladora

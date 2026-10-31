@@ -37,4 +37,8 @@ def create_app():
     
     from routes.tarifa_routes import tarifas_bp
     app.register_blueprint(tarifas_bp)
+    
+    from routes.pilado_routes import pilado_bp
+    app.register_blueprint(pilado_bp)
+    
     return app

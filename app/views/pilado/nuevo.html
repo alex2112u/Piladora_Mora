@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Nuevo pilado - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Registrar pilado</h1>
+  <a class="boton" href="{{ url_for('pilado.index') }}">Volver</a>
+</div>
+
+{% if not tarifa %}
+  <div class="alerta error">
+    No hay una tarifa de pilado registrada. Pídele al administrador que la cree en Tarifas.
+  </div>
+{% else %}
+  {% set etiqueta = etiquetas.get(tarifa.unidad, tarifa.unidad) %}
+  {% set pide_libras = tarifa.unidad in ('qq_pilado', 'lb_pilado') %}
+
+  <p>Tarifa vigente: <strong>${{ '%.2f'|format(tarifa.precio) }} por {{ etiqueta }}</strong></p>
+
+  <form method="post" class="formulario">
+    <label>Cliente</label>
+    <select name="cliente_id" required>
+      <option value="">— Selecciona un cliente —</option>
+      {% for cliente, sacos in clientes %}
+      <option value="{{ cliente.id }}"
+        {% if datos.get('cliente_id')|string == cliente.id|string %}selected{% endif %}>
+        {{ cliente.nombre }} ({{ sacos }} sacos guardados)
+      </option>
+      {% endfor %}
+    </select>
+
+    <label>Origen del arroz</label>
+    <div>
+      <label>
+        <input type="radio" name="origen" value="CUSTODIA"
+          {% if datos.get('origen', 'CUSTODIA') == 'CUSTODIA' %}checked{% endif %}>
+        Custodia (arroz guardado en la bodega)
+      </label>
+      <label>
+        <input type="radio" name="origen" value="EXTERNO"
+          {% if datos.get('origen') == 'EXTERNO' %}checked{% endif %}>
+        Externo (el cliente trae su propio arroz)
+      </label>
+    </div>
+
+    <label>Sacos de arroz en cáscara que entran
+      {% if tarifa.unidad == 'saco' %}(obligatorio){% else %}(obligatorio si es de custodia){% endif %}
+    </label>
+    <input type="number" name="sacos" min="0" step="1"
+           {% if tarifa.unidad == 'saco' %}required{% endif %}
+           value="{{ datos.get('sacos', '') }}">
+
+    <label>Libras de arroz pilado{% if pide_libras %} (obligatorio){% endif %}</label>
+    <input type="number" name="libras" min="0" step="0.01"
+           {% if pide_libras %}required{% endif %}
+           value="{{ datos.get('libras', '') }}">
+
+    <label>Observaciones (opcional)</label>
+    <input type="text" name="observaciones" maxlength="255"
+           value="{{ datos.get('observaciones', '') }}">
+
+    <button type="submit" class="boton">Registrar pilado y generar ticket</button>
+  </form>
+{% endif %}
+{% endblock %}

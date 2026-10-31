@@ -9,7 +9,7 @@ from app.services.inventario_service import saldo_cliente
 from config.constantes import LIBRAS_POR_QUINTAL, ETIQUETA_COBRO_CORTA
 
 
-def _tarifa_pilado():
+def tarifa_pilado():
     return (
         Tarifa.query.filter_by(servicio="PILADO", activo=True)
         .order_by(Tarifa.vigente_desde.desc(), Tarifa.id.desc())
@@ -52,7 +52,7 @@ def registrar_pilado(cliente_id, origen, libras_pilado=0, cantidad_cascara=0,
     if libras < 0 or sacos < 0:
         raise ValueError("Las cantidades no pueden ser negativas")
 
-    tarifa = _tarifa_pilado()
+    tarifa = tarifa_pilado()
     if tarifa is None:
         raise ValueError("No hay tarifa de pilado configurada")
     precio = Decimal(str(tarifa.precio))

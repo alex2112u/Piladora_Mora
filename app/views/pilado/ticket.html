@@ -1,0 +1,123 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Ticket PIL-{{ p.id }}{% endblock %}
+
+{% block cuerpo %}
+<style>
+  .barra { padding: 12px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .barra .grupo { display: flex; gap: 8px; align-items: center; margin: 0 12px; }
+
+  /* Vista previa de la media hoja A5 (solo en pantalla) */
+  .pagina { width: 148mm; margin: 12px auto; padding: 4mm; box-sizing: border-box;
+            background: #fff; border: 1px solid #bbb; position: relative; }
+  .pagina::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%;
+                    border-left: 1px dashed #aaa; }
+
+  /* La columna de tickets: izquierda por defecto, derecha con la clase "der" */
+  .hoja { width: 67mm; display: flex; flex-direction: column; }
+  .hoja.der { margin-left: 72.5mm; }
+
+  .ticket {
+    width: 67mm; height: 96mm; padding: 3mm; box-sizing: border-box;
+    background: #fff; color: #000; overflow: hidden; outline: 1px dotted #ccc;
+    font-family: "Courier New", monospace; font-size: 11px; line-height: 1.25;
+    display: flex; flex-direction: column;
+  }
+  .ticket .cab { border-bottom: 1px dashed #000; padding-bottom: 3px; margin-bottom: 3px; }
+  .ticket .neg { font-size: 13px; }
+  .ticket .centro { text-align: center; }
+  .ticket .copia { font-weight: bold; letter-spacing: 1px; }
+  .ticket .fila { display: flex; justify-content: space-between; gap: 6px; margin: 2px 0; }
+  .ticket .fila span:last-child { text-align: right; }
+  .ticket .total { font-size: 13px; font-weight: bold; margin: 4px 0;
+                   border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 3px 0; }
+  .ticket .pie { margin-top: auto; }
+  .ticket .firma { margin-top: 10px; text-align: center; }
+  .ticket .firma .linea { border-top: 1px solid #000; margin: 0 4mm 2px; }
+
+  /* Línea de corte entre los dos tickets */
+  .corte { width: 60mm; height: 6mm; display: flex; align-items: center;
+           font-family: "Courier New", monospace; font-size: 10px; }
+  .corte::before, .corte::after { content: ""; flex: 1; border-top: 1px dashed #000; }
+  .corte span { padding: 0 2mm; }
+
+  @media print {
+    @page { size: A5 portrait; margin: 4mm; }
+    html, body { height: auto !important; min-height: 0 !important;
+                 margin: 0 !important; background: #fff !important; }
+    .no-imprimir { display: none !important; }
+    .pagina { width: auto; margin: 0; padding: 0; border: 0; }
+    .pagina::before { display: none; }
+    .hoja { max-height: 200mm; overflow: hidden; }
+    .ticket { outline: 0; }
+  }
+</style>
+
+<div class="barra no-imprimir">
+  <button type="button" class="boton" onclick="window.print()">Imprimir</button>
+  <div class="grupo">
+    <span>Lado de la hoja:</span>
+    <label><input type="radio" name="lado" value="izq" checked onchange="cambiarLado(this.value)"> Izquierdo</label>
+    <label><input type="radio" name="lado" value="der" onchange="cambiarLado(this.value)"> Derecho</label>
+  </div>
+  <a class="boton" href="{{ url_for('pilado.nuevo') }}">Nuevo pilado</a>
+  <a href="{{ url_for('pilado.index') }}">Ver pilados</a>
+</div>
+
+<div class="pagina">
+  <div class="hoja" id="hoja">
+    {% for copia in ['COPIA CLIENTE', 'COPIA PILADORA'] %}
+    <div class="ticket">
+      <div class="cab">
+        <div class="fila"><strong class="neg">{{ negocio }}</strong><strong>PIL-{{ p.id }}</strong></div>
+        <div class="centro">TICKET DE PILADO</div>
+        <div class="centro copia">{{ copia }}</div>
+      </div>
+
+      <div class="fila"><span>Fecha</span><span>{{ p.fecha.strftime('%d/%m/%Y %H:%M') if p.fecha else '' }}</span></div>
+      <div class="fila"><span>Cliente</span><span>{{ p.cliente.nombre }}</span></div>
+      {% if p.cliente.documento %}
+      <div class="fila"><span>Cédula</span><span>{{ p.cliente.documento }}</span></div>
+      {% endif %}
+      <div class="fila"><span>Origen</span><span>{{ 'Custodia' if p.origen == 'CUSTODIA' else 'Arroz del cliente' }}</span></div>
+
+      {% if p.cantidad_cascara and p.cantidad_cascara > 0 %}
+      <div class="fila"><span>Cáscara</span><span>{{ '%g'|format(p.cantidad_cascara) }} sacos</span></div>
+      {% endif %}
+      {% if p.cantidad_arroz and p.cantidad_arroz > 0 %}
+      <div class="fila"><span>Arroz pilado</span><span>{{ '%g'|format(p.cantidad_arroz) }} lb</span></div>
+      <div class="fila"><span>Equivale a</span><span>{{ '%.2f'|format(p.cantidad_arroz / libras_por_quintal) }} qq</span></div>
+      {% endif %}
+      {% set etiqueta = etiquetas.get(p.unidad_cobro) %}
+      <div class="fila">
+        <span>Precio</span>
+        <span>${{ '%.2f'|format(p.precio_unitario) }}{% if etiqueta %} por {{ etiqueta }}{% endif %}</span>
+      </div>
+
+      <div class="fila total"><span>TOTAL A COBRAR</span><span>${{ '%.2f'|format(p.total) }}</span></div>
+
+      <div class="pie">
+        {% if p.usuario %}<div>Atendió: {{ p.usuario.nombre }}</div>{% endif %}
+        {% if copia == 'COPIA PILADORA' %}
+        <div class="firma">
+          <div class="linea"></div>
+          <small>Recibí conforme (firma del cliente)</small>
+        </div>
+        {% else %}
+        <div class="centro">¡Gracias por su preferencia!</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if not loop.last %}
+    <div class="corte"><span>✂ cortar</span></div>
+    {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function cambiarLado(lado) {
+    document.getElementById('hoja').classList.toggle('der', lado === 'der');
+  }
+</script>
+{% endblock %}
