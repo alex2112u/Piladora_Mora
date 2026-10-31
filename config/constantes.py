@@ -18,3 +18,10 @@ UNIDADES_POR_SERVICIO = {
         "saco_mes": "Por saco, cada mes",
     },
 }
+
+ETIQUETA_COBRO_CORTA = {
+    "qq_pilado": "quintal",
+    "lb_pilado": "libra",
+    "saco": "saco",
+    "saco_mes": "saco por mes",
+}
