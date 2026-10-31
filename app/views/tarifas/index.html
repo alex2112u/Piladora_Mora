@@ -1,0 +1,50 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Tarifas - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Tarifas</h1>
+  <a class="boton" href="{{ url_for('tarifas.crear') }}">+ Nueva tarifa</a>
+</div>
+
+<p>Cambiar un precio no modifica los cobros ya registrados, solo los nuevos.</p>
+
+<h2>Vigentes</h2>
+<table class="tabla">
+  <thead>
+    <tr><th>Servicio</th><th>Se cobra</th><th>Precio</th><th>Desde</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for t in vigentes %}
+    <tr>
+      <td>{{ nombres.get(t.servicio, t.servicio) }}</td>
+      <td>{{ unidades.get(t.servicio, {}).get(t.unidad, t.unidad) }}</td>
+      <td>${{ '%.2f'|format(t.precio) }}</td>
+      <td>{{ t.vigente_desde.strftime('%d/%m/%Y') if t.vigente_desde else '' }}</td>
+      <td><span class="badge entrada">Vigente</span></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">Aún no hay tarifas. Crea la primera con "Nueva tarifa".</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Historial de precios anteriores</h2>
+<table class="tabla">
+  <thead>
+    <tr><th>Servicio</th><th>Se cobraba</th><th>Precio</th><th>Desde</th></tr>
+  </thead>
+  <tbody>
+    {% for t in anteriores %}
+    <tr>
+      <td>{{ nombres.get(t.servicio, t.servicio) }}</td>
+      <td>{{ unidades.get(t.servicio, {}).get(t.unidad, t.unidad) }}</td>
+      <td>${{ '%.2f'|format(t.precio) }}</td>
+      <td>{{ t.vigente_desde.strftime('%d/%m/%Y') if t.vigente_desde else '' }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4">Todavía no hay precios anteriores.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Nueva tarifa - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Nueva tarifa</h1>
+  <a class="boton" href="{{ url_for('tarifas.index') }}">Volver</a>
+</div>
+
+<form method="post" class="formulario">
+  <label>¿Qué se cobra y cómo?</label>
+  <select name="tipo" required>
+    <option value="">— Selecciona —</option>
+    {% for servicio, opciones in unidades.items() %}
+    <optgroup label="{{ nombres[servicio] }}">
+      {% for unidad, texto in opciones.items() %}
+      {% set valor = servicio ~ ':' ~ unidad %}
+      <option value="{{ valor }}"
+        {% if datos.get('tipo') == valor %}selected{% endif %}>{{ texto }}</option>
+      {% endfor %}
+    </optgroup>
+    {% endfor %}
+  </select>
+
+  <label>Precio (USD)</label>
+  <input type="number" name="precio" step="0.01" min="0.01" required
+         value="{{ datos.get('precio', '') }}">
+
+  <button type="submit" class="boton">Guardar tarifa</button>
+</form>
+{% endblock %}

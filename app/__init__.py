@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, app
 from config.config import Config
 from app.extensions import db, migrate, login_manager
 
@@ -31,7 +31,10 @@ def create_app():
     app.register_blueprint(bodega_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
+    
     from routes.cliente_routes import clientes_bp
     app.register_blueprint(clientes_bp)
-
+    
+    from routes.tarifa_routes import tarifas_bp
+    app.register_blueprint(tarifas_bp)
     return app
