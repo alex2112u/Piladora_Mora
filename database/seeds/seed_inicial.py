@@ -11,7 +11,7 @@ from app.models.producto import Producto
 def sembrar():
     # Roles
     for nombre, desc in [("Administrador", "Acceso total"),
-                         ("Operador", "Bodega, pilado y cobros")]:
+                        ("Operador", "Bodega, pilado y cobros")]:
         if not Rol.query.filter_by(nombre=nombre).first():
             db.session.add(Rol(nombre=nombre, descripcion=desc))
     db.session.commit()
