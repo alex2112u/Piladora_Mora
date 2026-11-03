@@ -78,9 +78,13 @@
       {% if p.cliente.documento %}
       <div class="fila"><span>Cédula</span><span>{{ p.cliente.documento }}</span></div>
       {% endif %}
-      <div class="fila"><span>Origen</span><span>{{ 'Custodia' if p.origen == 'CUSTODIA' else 'Arroz del cliente' }}</span></div>
 
+      <div class="fila"><span>Origen</span><span>{{ 'Custodia' if p.origen == 'CUSTODIA' else 'Arroz del cliente' }}</span></div>
       {% if p.cantidad_cascara and p.cantidad_cascara > 0 %}
+            {% if p.servicio_tarifa %}
+      <div class="fila"><span>Polvillo</span><span>{{ 'Se lo lleva' if p.servicio_tarifa == 'PILADO_POLVILLO' else 'No se lo lleva' }}</span></div>
+      {% endif %}
+      
       <div class="fila"><span>Cáscara</span><span>{{ '%g'|format(p.cantidad_cascara) }} sacos</span></div>
       {% endif %}
       {% if p.cantidad_arroz and p.cantidad_arroz > 0 %}

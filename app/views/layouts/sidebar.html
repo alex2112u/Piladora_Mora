@@ -1,10 +1,14 @@
 <aside class="sidebar">
-  <h2>🌾 Piladora</h2>
+  <h2>🌾 Piladora La Constancia</h2>
   <nav>
 <a href="{{ url_for('dashboard.index') }}">Inicio</a>
   <a href="{{ url_for('clientes.index') }}">Clientes</a>
     <a href="{{ url_for('bodega.index') }}">Bodega</a>
-        {% if current_user.rol and current_user.rol.nombre == 'Administrador' %}
+    <a href="{{ url_for('cobros.index') }}">Cobros</a>
+
+
+  
+{% if current_user.rol and current_user.rol.nombre == 'Administrador' %}
       <a href="{{ url_for('tarifas.index') }}">Tarifas</a>
           {% endif %}
               <a href="{{ url_for('pilado.index') }}">Pilado</a>

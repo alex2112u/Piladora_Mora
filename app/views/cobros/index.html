@@ -1,1 +1,68 @@
-<!-- index.html - pendiente de implementar -->
+{% extends "layouts/base.html" %}
+{% block titulo %}Cobros - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Cobros</h1>
+</div>
+
+<p>
+  Total por cobrar: <strong>${{ '%.2f'|format(total_por_cobrar) }}</strong>
+  en {{ cantidad_pendientes }} cuenta(s) pendiente(s)
+</p>
+
+<form method="get" class="buscador">
+  <input type="hidden" name="estado" value="{{ estado }}">
+  <input type="text" name="q" value="{{ q }}"
+         placeholder="Buscar por cédula o nombre del cliente...">
+  <button type="submit" class="boton">Buscar</button>
+  {% if q %}<a href="{{ url_for('cobros.index', estado=estado) }}">Limpiar</a>{% endif %}
+</form>
+
+<p>
+  Mostrar:
+  {% for clave, texto in [('pendientes', 'Pendientes'), ('pagadas', 'Pagadas'), ('todas', 'Todas')] %}
+    {% if estado == clave %}<strong>{{ texto }}</strong>
+    {% else %}<a href="{{ url_for('cobros.index', estado=clave, q=q) }}">{{ texto }}</a>{% endif %}
+    {% if not loop.last %} | {% endif %}
+  {% endfor %}
+</p>
+
+<table class="tabla">
+  <thead>
+    <tr>
+      <th>Referencia</th><th>Fecha</th><th>Cliente</th><th>Concepto</th>
+      <th>Total</th><th>Pagado</th><th>Saldo</th><th>Estado</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in cuentas %}
+    <tr>
+      <td>{{ c.referencia or '' }}</td>
+      <td>{{ c.fecha.strftime('%d/%m/%Y') if c.fecha else '' }}</td>
+      <td>{{ c.cliente.nombre }}</td>
+      <td>{{ c.concepto|capitalize }}</td>
+      <td>${{ '%.2f'|format(c.total) }}</td>
+      <td>${{ '%.2f'|format(c.pagado) }}</td>
+      <td>${{ '%.2f'|format(c.saldo) }}</td>
+      <td>
+        <span class="badge {{ 'entrada' if c.estado == 'PAGADA' else ('salida' if c.estado == 'PENDIENTE' else '') }}">
+          {{ c.estado }}
+        </span>
+      </td>
+      <td>
+        <a href="{{ url_for('cobros.cuenta', id=c.id) }}">
+          {% if c.estado in ('PENDIENTE', 'PARCIAL') %}Cobrar{% else %}Ver{% endif %}
+        </a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="9">
+      {% if q %}No hay cuentas que coincidan con "{{ q }}".
+      {% elif estado == 'pendientes' %}No hay cuentas pendientes. ¡Todo cobrado!
+      {% else %}No hay cuentas para mostrar.{% endif %}
+    </td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

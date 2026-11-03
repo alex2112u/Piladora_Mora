@@ -8,10 +8,15 @@ from app.models.movimiento_inventario import MovimientoInventario
 from app.services.inventario_service import saldo_cliente
 from config.constantes import LIBRAS_POR_QUINTAL, ETIQUETA_COBRO_CORTA
 
+SERVICIO_SIN_POLVILLO = "PILADO"
+SERVICIO_CON_POLVILLO = "PILADO_POLVILLO"
 
-def tarifa_pilado():
+
+def tarifa_pilado(con_polvillo=False):
+    """Tarifa vigente del pilado, con o sin polvillo."""
+    servicio = SERVICIO_CON_POLVILLO if con_polvillo else SERVICIO_SIN_POLVILLO
     return (
-        Tarifa.query.filter_by(servicio="PILADO", activo=True)
+        Tarifa.query.filter_by(servicio=servicio, activo=True)
         .order_by(Tarifa.vigente_desde.desc(), Tarifa.id.desc())
         .first()
     )
@@ -36,12 +41,13 @@ def calcular_total_pilado(unidad, precio, libras_pilado, sacos_cascara):
 def registrar_pilado(cliente_id, origen, libras_pilado=0, cantidad_cascara=0,
                      cantidad_polvillo=0, cantidad_tamo=0,
                      producto_cascara_id=None, usuario_id=None,
-                     observaciones=None):
+                     observaciones=None, con_polvillo=False):
     """
     Registra un pilado y genera su cuenta por cobrar.
     origen: "CUSTODIA" (arroz guardado en bodega) o "EXTERNO" (lo trae el cliente).
     libras_pilado: libras de arroz pilado que se lleva el cliente.
     cantidad_cascara: sacos de cáscara que entran a la máquina.
+    con_polvillo: True si el cliente se lleva el polvillo (tarifa "con polvillo").
     """
     origen = origen.upper()
     if origen not in ("CUSTODIA", "EXTERNO"):
@@ -52,9 +58,13 @@ def registrar_pilado(cliente_id, origen, libras_pilado=0, cantidad_cascara=0,
     if libras < 0 or sacos < 0:
         raise ValueError("Las cantidades no pueden ser negativas")
 
-    tarifa = tarifa_pilado()
+    tarifa = tarifa_pilado(con_polvillo)
+    variante = "con polvillo" if con_polvillo else "sin polvillo"
     if tarifa is None:
-        raise ValueError("No hay tarifa de pilado configurada")
+        raise ValueError(
+            f"No hay tarifa de pilado {variante}. "
+            "Pídele al administrador que la cree en Tarifas."
+        )
     precio = Decimal(str(tarifa.precio))
 
     # Qué dato es obligatorio depende de cómo se cobra
@@ -93,6 +103,7 @@ def registrar_pilado(cliente_id, origen, libras_pilado=0, cantidad_cascara=0,
             cantidad_tamo=Decimal(str(cantidad_tamo)),
             precio_unitario=precio,
             unidad_cobro=tarifa.unidad,
+            servicio_tarifa=tarifa.servicio,
             total=total,
             observaciones=observaciones,
         )
@@ -117,7 +128,8 @@ def registrar_pilado(cliente_id, origen, libras_pilado=0, cantidad_cascara=0,
             cliente_id=cliente_id,
             concepto="PILADO",
             referencia=f"PIL-{pilado.id}",
-            descripcion=f"Pilado {origen.lower()}: {detalle} a ${precio} por {etiqueta}",
+            descripcion=(f"Pilado {origen.lower()} {variante}: "
+                         f"{detalle} a ${precio} por {etiqueta}"),
             fecha=ahora,
             total=total,
         )

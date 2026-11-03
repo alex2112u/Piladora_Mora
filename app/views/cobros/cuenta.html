@@ -1,0 +1,78 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Cuenta {{ cuenta.referencia or cuenta.id }} - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Cuenta {{ cuenta.referencia or cuenta.id }}</h1>
+  <a class="boton" href="{{ url_for('cobros.index') }}">Volver</a>
+</div>
+
+<table class="tabla">
+  <tbody>
+    <tr><th>Cliente</th><td>{{ cuenta.cliente.nombre }}
+        {% if cuenta.cliente.documento %}({{ cuenta.cliente.documento }}){% endif %}</td></tr>
+    <tr><th>Concepto</th><td>{{ cuenta.concepto|capitalize }}</td></tr>
+    <tr><th>Detalle</th><td>{{ cuenta.descripcion or '' }}</td></tr>
+    <tr><th>Fecha</th><td>{{ cuenta.fecha.strftime('%d/%m/%Y %H:%M') if cuenta.fecha else '' }}</td></tr>
+    <tr><th>Total</th><td>${{ '%.2f'|format(cuenta.total) }}</td></tr>
+    <tr><th>Pagado</th><td>${{ '%.2f'|format(cuenta.pagado) }}</td></tr>
+    <tr><th>Saldo pendiente</th><td><strong>${{ '%.2f'|format(cuenta.saldo) }}</strong></td></tr>
+    <tr><th>Estado</th><td>{{ cuenta.estado }}</td></tr>
+  </tbody>
+</table>
+
+{% if cuenta.estado in ('PENDIENTE', 'PARCIAL') %}
+<h2>Registrar abono</h2>
+<form method="post" class="formulario"
+      onsubmit="this.querySelector('button[type=submit]').disabled = true;">
+  <label>Monto a cobrar (USD)</label>
+  <div>
+    <input type="number" id="monto" name="monto" step="0.01" min="0.01"
+           max="{{ '%.2f'|format(cuenta.saldo) }}" required
+           value="{{ datos.get('monto', '') }}">
+    
+    <br><button type="button" class="boton"
+            onclick="document.getElementById('monto').value = '{{ '%.2f'|format(cuenta.saldo) }}'">Cobrar todo el saldo
+    </button>
+  </div>
+
+  <label>Forma de pago</label>
+  <select name="forma_pago" required>
+    {% for clave, texto in formas.items() %}
+    <option value="{{ clave }}" {% if datos.get('forma_pago') == clave %}selected{% endif %}>{{ texto }}</option>
+    {% endfor %}
+  </select>
+
+  <label>N.° de transferencia o cheque (obligatorio si no es efectivo)</label>
+  <input type="text" name="comprobante" maxlength="255"
+         value="{{ datos.get('comprobante', '') }}">
+
+  <label>Observaciones (opcional)</label>
+  <input type="text" name="observaciones" maxlength="255"
+         value="{{ datos.get('observaciones', '') }}">
+
+  <button type="submit" class="boton">Registrar abono</button>
+</form>
+{% endif %}
+
+<h2>Historial de abonos</h2>
+<table class="tabla">
+  <thead>
+    <tr><th>Fecha y hora</th><th>Monto</th><th>Forma</th><th>Comprobante</th><th>Registró</th><th>Observaciones</th></tr>
+  </thead>
+  <tbody>
+    {% for a in abonos %}
+    <tr>
+      <td>{{ a.fecha.strftime('%d/%m/%Y %H:%M') if a.fecha else '' }}</td>
+      <td>${{ '%.2f'|format(a.monto) }}</td>
+      <td>{{ formas.get(a.forma_pago, a.forma_pago) }}</td>
+      <td>{{ a.comprobante or '' }}</td>
+      <td>{{ a.usuario.nombre if a.usuario else '' }}</td>
+      <td>{{ a.observaciones or '' }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">Todavía no hay abonos en esta cuenta.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

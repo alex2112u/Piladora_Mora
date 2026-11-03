@@ -7,15 +7,21 @@
   <a class="boton" href="{{ url_for('pilado.index') }}">Volver</a>
 </div>
 
-{% if not tarifa %}
+{% if not t_sin and not t_con %}
   <div class="alerta error">
-    No hay una tarifa de pilado registrada. Pídele al administrador que la cree en Tarifas.
+    No hay tarifas de pilado registradas. Pídele al administrador que las cree en Tarifas.
   </div>
 {% else %}
-  {% set etiqueta = etiquetas.get(tarifa.unidad, tarifa.unidad) %}
-  {% set pide_libras = tarifa.unidad in ('qq_pilado', 'lb_pilado') %}
 
-  <p>Tarifa vigente: <strong>${{ '%.2f'|format(tarifa.precio) }} por {{ etiqueta }}</strong></p>
+  <p>
+    <strong>Tarifas vigentes</strong><br>
+    Sin polvillo:
+    {% if t_sin %}${{ '%.2f'|format(t_sin.precio) }} por {{ etiquetas.get(t_sin.unidad, t_sin.unidad) }}
+    {% else %}<em>falta crear la tarifa</em>{% endif %}<br>
+    Con polvillo:
+    {% if t_con %}${{ '%.2f'|format(t_con.precio) }} por {{ etiquetas.get(t_con.unidad, t_con.unidad) }}
+    {% else %}<em>falta crear la tarifa</em>{% endif %}
+  </p>
 
   <form method="post" class="formulario">
     <label>Cliente</label>
@@ -43,11 +49,25 @@
       </label>
     </div>
 
+    <label>¿El cliente se lleva el polvillo?</label>
+    <div>
+      <label>
+        <input type="radio" name="polvillo" value="CON" required
+          {% if datos.get('polvillo') == 'CON' %}checked{% endif %}>
+        Sí se lo lleva (Pilado con polvillo{% if t_con %}: ${{ '%.2f'|format(t_con.precio) }}{% endif %})
+      </label>
+      <label>
+        <input type="radio" name="polvillo" value="SIN"
+          {% if datos.get('polvillo') == 'SIN' %}checked{% endif %}>
+        No se lo lleva (Pilado sin polvillo{% if t_sin %}: ${{ '%.2f'|format(t_sin.precio) }}{% endif %})
+      </label>
+    </div>
+
     <label>Sacos de arroz en cáscara que entran
-      {% if tarifa.unidad == 'saco' %}(obligatorio){% else %}(obligatorio si es de custodia){% endif %}
+      {% if pide_sacos %}(obligatorio){% else %}(obligatorio si es de custodia){% endif %}
     </label>
     <input type="number" name="sacos" min="0" step="1"
-           {% if tarifa.unidad == 'saco' %}required{% endif %}
+           {% if pide_sacos %}required{% endif %}
            value="{{ datos.get('sacos', '') }}">
 
     <label>Libras de arroz pilado{% if pide_libras %} (obligatorio){% endif %}</label>

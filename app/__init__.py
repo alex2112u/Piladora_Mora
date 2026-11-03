@@ -41,4 +41,7 @@ def create_app():
     from routes.pilado_routes import pilado_bp
     app.register_blueprint(pilado_bp)
     
+    from routes.cobro_routes import cobros_bp 
+    app.register_blueprint(cobros_bp)
+
     return app

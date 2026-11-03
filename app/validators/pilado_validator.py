@@ -26,6 +26,11 @@ def validar_pilado(form):
     if origen not in ORIGENES_VALIDOS:
         errores.append("Elige si el arroz es de custodia o del cliente.")
 
+    # --- ¿El cliente se lleva el polvillo? Se elige a propósito, sin valor por defecto ---
+    polvillo = form.get("polvillo", "")
+    if polvillo not in ("CON", "SIN"):
+        errores.append("Indica si el cliente se lleva el polvillo o no.")
+
     # --- Sacos de cáscara (vacío = 0; si hay valor, entero) ---
     sacos = 0
     texto_sacos = form.get("sacos", "").strip()
@@ -55,6 +60,7 @@ def validar_pilado(form):
     datos = {
         "cliente_id": cliente.id if cliente else None,
         "origen": origen,
+        "con_polvillo": polvillo == "CON",
         "cantidad_cascara": sacos,
         "libras_pilado": libras,
         "observaciones": observaciones or None,

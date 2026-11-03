@@ -20,6 +20,7 @@ class Pilado(db.Model):
     unidad_cobro = db.Column(db.String(20))  # unidad de la tarifa usada: qq_pilado, lb_pilado, saco
     total = db.Column(db.Numeric(12, 2), nullable=False)
     observaciones = db.Column(db.String(255))
+    servicio_tarifa = db.Column(db.String(20))  # tarifa aplicada: PILADO o PILADO_POLVILLO
 
     cliente = db.relationship("Cliente")
     usuario = db.relationship("Usuario")

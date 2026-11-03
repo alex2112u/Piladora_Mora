@@ -9,7 +9,7 @@
 
 <form method="get" class="buscador">
   <input type="text" name="q" value="{{ q }}"
-         placeholder="Buscar por cédula o nombre del cliente...">
+    placeholder="Buscar por cédula o nombre del cliente...">
   <button type="submit" class="boton">Buscar</button>
   {% if q %}<a href="{{ url_for('pilado.index') }}">Limpiar</a>{% endif %}
 </form>
@@ -30,7 +30,11 @@
       <td>{{ 'Custodia' if p.origen == 'CUSTODIA' else 'Externo' }}</td>
       <td>{{ '%g'|format(p.cantidad_arroz or 0) }}</td>
       <td>${{ '%.2f'|format(p.total) }}</td>
-      <td>{{ p.cuenta.estado if p.cuenta else '' }}</td>
+      <td>
+          {% if p.cuenta %}
+            <a href="{{ url_for('cobros.cuenta', id=p.cuenta.id) }}">{{ p.cuenta.estado }}</a>
+          {% endif %}
+        </td>
       <td><a href="{{ url_for('pilado.ticket', id=p.id) }}">Ver ticket</a></td>
     </tr>
     {% else %}

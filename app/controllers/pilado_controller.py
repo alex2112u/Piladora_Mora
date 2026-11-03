@@ -13,12 +13,20 @@ from config.constantes import (
 
 
 def _mostrar_formulario(datos):
+    t_sin = tarifa_pilado(con_polvillo=False)
+    t_con = tarifa_pilado(con_polvillo=True)
+    tarifas = [t for t in (t_sin, t_con) if t]
+
+    # Qué campos son obligatorios depende de cómo se cobre cada tarifa
+    pide_libras = any(t.unidad in ("qq_pilado", "lb_pilado") for t in tarifas)
+    pide_sacos = any(t.unidad == "saco" for t in tarifas)
+
     return render_template("pilado/nuevo.html",
                            clientes=_clientes_con_saldo(),
                            datos=datos,
-                           tarifa=tarifa_pilado(),
+                           t_sin=t_sin, t_con=t_con,
+                           pide_libras=pide_libras, pide_sacos=pide_sacos,
                            etiquetas=ETIQUETA_COBRO_CORTA)
-
 
 def index():
     q = request.args.get("q", "").strip()
