@@ -1,0 +1,76 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Reporte de bodega - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Reporte de bodega</h1>
+  <div class="no-imprimir">
+    <a class="boton" href="{{ url_for('reportes.bodega', formato='csv', desde=desde, hasta=hasta, q=q) }}">Descargar CSV</a>
+    <button type="button" class="boton" onclick="window.print()">Imprimir</button>
+  </div>
+</div>
+
+<p>
+  Del {{ desde.strftime('%d/%m/%Y') }} al {{ hasta.strftime('%d/%m/%Y') }}
+  {% if q %} · Cliente: "{{ q }}"{% endif %}<br>
+  <small>Generado el {{ generado.strftime('%d/%m/%Y %H:%M') }} por {{ current_user.nombre }}.
+  Las salidas incluyen retiros y sacos usados para pilar.</small>
+</p>
+
+<form method="get" class="buscador no-imprimir">
+  <label>Desde <input type="date" name="desde" value="{{ desde.isoformat() }}"></label>
+  <label>Hasta <input type="date" name="hasta" value="{{ hasta.isoformat() }}"></label>
+  <input type="text" name="q" value="{{ q }}" placeholder="Cédula o nombre del cliente">
+  <button type="submit" class="boton">Filtrar</button>
+  <a href="{{ url_for('reportes.bodega') }}">Limpiar</a>
+</form>
+
+<div class="tarjetas">
+  <div class="tarjeta">
+    <small>Saldo al {{ hasta.strftime('%d/%m/%Y') }}</small>
+    <strong>{{ '%g'|format(totales[3]) }} sacos</strong>
+  </div>
+  <div class="tarjeta">
+    <small>Entradas del período</small>
+    <strong>{{ '%g'|format(totales[1]) }}</strong>
+  </div>
+  <div class="tarjeta">
+    <small>Salidas del período</small>
+    <strong>{{ '%g'|format(totales[2]) }}</strong>
+  </div>
+</div>
+
+<table class="tabla">
+  <thead>
+    <tr>
+      <th>Cliente</th><th>Cédula</th><th>Saldo inicial</th>
+      <th>Entradas</th><th>Salidas</th><th>Saldo final</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cliente, ini, ent, sal, fin in filas %}
+    <tr>
+      <td>{{ cliente.nombre }}{% if not cliente.activo %} <span class="badge salida">inactivo</span>{% endif %}</td>
+      <td>{{ cliente.documento or '' }}</td>
+      <td>{{ '%g'|format(ini) }}</td>
+      <td>{{ '%g'|format(ent) }}</td>
+      <td>{{ '%g'|format(sal) }}</td>
+      <td><strong>{{ '%g'|format(fin) }}</strong></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No hay movimientos de bodega en este período.</td></tr>
+    {% endfor %}
+  </tbody>
+  {% if filas %}
+  <tfoot>
+    <tr>
+      <th colspan="2">Total</th>
+      <th>{{ '%g'|format(totales[0]) }}</th>
+      <th>{{ '%g'|format(totales[1]) }}</th>
+      <th>{{ '%g'|format(totales[2]) }}</th>
+      <th>{{ '%g'|format(totales[3]) }}</th>
+    </tr>
+  </tfoot>
+  {% endif %}
+</table>
+{% endblock %}

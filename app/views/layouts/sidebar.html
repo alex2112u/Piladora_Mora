@@ -5,11 +5,17 @@
   <a href="{{ url_for('clientes.index') }}">Clientes</a>
     <a href="{{ url_for('bodega.index') }}">Bodega</a>
     <a href="{{ url_for('cobros.index') }}">Cobros</a>
-
+  
 
   
 {% if current_user.rol and current_user.rol.nombre == 'Administrador' %}
       <a href="{{ url_for('tarifas.index') }}">Tarifas</a>
+
+{% if current_user.rol and current_user.rol.nombre == 'Administrador' %}
+
+<a href="{{ url_for('reportes.index') }}">Reportes</a>
+{% endif %}
+
           {% endif %}
               <a href="{{ url_for('pilado.index') }}">Pilado</a>
 <!-- Aquí iremos agregando: Clientes, Bodega, Pilado, Cobros -->

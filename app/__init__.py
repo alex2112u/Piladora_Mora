@@ -43,5 +43,8 @@ def create_app():
     
     from routes.cobro_routes import cobros_bp 
     app.register_blueprint(cobros_bp)
+    
+    from routes.reporte_routes import reportes_bp
+    app.register_blueprint(reportes_bp)
 
     return app

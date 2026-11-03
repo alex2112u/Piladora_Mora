@@ -1,0 +1,74 @@
+{% extends "layouts/base.html" %}
+{% block titulo %}Reporte de deuda - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<div class="encabezado">
+  <h1>Reporte de deuda</h1>
+  <div class="no-imprimir">
+    <a class="boton" href="{{ url_for('reportes.deuda', formato='csv', q=q) }}">Descargar CSV</a>
+    <button type="button" class="boton" onclick="window.print()">Imprimir</button>
+  </div>
+</div>
+
+<p>
+  Cuentas con saldo pendiente
+  {% if q %} · Cliente: "{{ q }}"{% endif %}<br>
+  <small>Generado el {{ generado.strftime('%d/%m/%Y %H:%M') }} por {{ current_user.nombre }}</small>
+</p>
+
+<form method="get" class="buscador no-imprimir">
+  <input type="text" name="q" value="{{ q }}" placeholder="Cédula o nombre del cliente">
+  <button type="submit" class="boton">Buscar</button>
+  <a href="{{ url_for('reportes.deuda') }}">Limpiar</a>
+</form>
+
+<div class="tarjetas">
+  <div class="tarjeta">
+    <small>Total por cobrar</small>
+    <strong>${{ '%.2f'|format(total) }}</strong>
+    <small>{{ filas|length }} cuenta(s)</small>
+  </div>
+  <div class="tarjeta">
+    <small>De 0 a 30 días</small>
+    <strong>${{ '%.2f'|format(rangos['0-30']) }}</strong>
+  </div>
+  <div class="tarjeta">
+    <small>De 31 a 60 días</small>
+    <strong>${{ '%.2f'|format(rangos['31-60']) }}</strong>
+  </div>
+  <div class="tarjeta">
+    <small>Más de 60 días</small>
+    <strong>${{ '%.2f'|format(rangos['61+']) }}</strong>
+  </div>
+</div>
+
+<table class="tabla">
+  <thead>
+    <tr>
+      <th>Cliente</th><th>Referencia</th><th>Concepto</th><th>Fecha</th>
+      <th>Total</th><th>Pagado</th><th>Saldo</th><th>Días</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c, saldo, dias in filas %}
+    <tr>
+      <td>{{ c.cliente.nombre }}{% if c.cliente.documento %} <small>({{ c.cliente.documento }})</small>{% endif %}</td>
+      <td>{{ c.referencia or '' }}</td>
+      <td>{{ c.concepto|capitalize }}</td>
+      <td>{{ c.fecha.strftime('%d/%m/%Y') if c.fecha else '' }}</td>
+      <td>${{ '%.2f'|format(c.total) }}</td>
+      <td>${{ '%.2f'|format(c.pagado) }}</td>
+      <td><strong>${{ '%.2f'|format(saldo) }}</strong></td>
+      <td>{% if dias > 60 %}<span class="badge salida">{{ dias }}</span>{% else %}{{ dias }}{% endif %}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8">No hay deudas pendientes.</td></tr>
+    {% endfor %}
+  </tbody>
+  {% if filas %}
+  <tfoot>
+    <tr><th colspan="6">Total por cobrar</th><th>${{ '%.2f'|format(total) }}</th><th></th></tr>
+  </tfoot>
+  {% endif %}
+</table>
+{% endblock %}

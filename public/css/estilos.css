@@ -27,6 +27,7 @@ body { margin: 0; font-family: system-ui, Arial, sans-serif; background: #f4f5f0
 .acciones { display: flex; gap: 8px; align-items: center; }
 
 .boton { display: inline-block; padding: 9px 16px; background: #2f4a2f; color: #fff; border: 0; border-radius: 6px; text-decoration: none; font-size: 14px; cursor: pointer; }
+.boton + .boton { margin-left: 8px; }
 .boton:hover { background: #3d5f3d; }
 .boton.gris { background: #777; }
 
@@ -57,3 +58,19 @@ body { margin: 0; font-family: system-ui, Arial, sans-serif; background: #f4f5f0
 
 .badge.entrada { background: #dcfce7; color: #166534; }
 .badge.salida  { background: #fee2e2; color: #991b1b; }
+
+/* Inicio: tarjetas clicables y dos columnas */
+a.tarjeta { display: block; text-decoration: none; color: inherit; }
+a.tarjeta:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, .15); }
+.dos-columnas { display: flex; gap: 24px; flex-wrap: wrap; }
+.dos-columnas > div { flex: 1; min-width: 320px; }
+
+/* Reportes: al imprimir se ocultan el menú y los filtros */
+@media print {
+  .sidebar, .no-imprimir { display: none !important; }
+  body { background: #fff !important; }
+  .contenido { padding: 0 !important; }
+  .tarjeta { border: 1px solid #ccc; }
+  .tabla { font-size: 12px; }
+  .tabla tr { page-break-inside: avoid; }
+}

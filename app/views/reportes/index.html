@@ -1,1 +1,26 @@
 <!-- index.html - pendiente de implementar -->
+{% extends "layouts/base.html" %}
+{% block titulo %}Reportes - Piladora CRM{% endblock %}
+
+{% block contenido %}
+<h1>Reportes</h1>
+<p>Elige un reporte. Todos se pueden imprimir o descargar para Excel.</p>
+
+<div class="tarjetas">
+  <a class="tarjeta" href="{{ url_for('reportes.cobros') }}">
+    <small>Reporte de</small>
+    <strong>Cobros</strong>
+    <small>Lo que entró en un período, por forma de pago</small>
+  </a>
+  <a class="tarjeta" href="{{ url_for('reportes.deuda') }}">
+    <small>Reporte de</small>
+    <strong>Deuda</strong>
+    <small>Quién debe, cuánto y desde hace cuántos días</small>
+  </a>
+  <a class="tarjeta" href="{{ url_for('reportes.bodega') }}">
+    <small>Reporte de</small>
+    <strong>Bodega</strong>
+    <small>Sacos por cliente: inicial, entradas, salidas y final</small>
+  </a>
+</div>
+{% endblock %}

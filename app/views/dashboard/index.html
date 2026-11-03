@@ -1,8 +1,82 @@
-<!-- index.html - pendiente de implementar -->
 {% extends "layouts/base.html" %}
 {% block titulo %}Inicio - Piladora CRM{% endblock %}
 
 {% block contenido %}
 <h1>Bienvenido, {{ current_user.nombre }}</h1>
-<p>El sistema está funcionando. Aquí irá el resumen de bodega, pilados y cobros pendientes.</p>
+<p>Resumen del {{ hoy.strftime('%d/%m/%Y') }}</p>
+
+<div class="tarjetas">
+  <a class="tarjeta" href="{{ url_for('cobros.index') }}">
+    <small>Total por cobrar</small>
+    <strong>${{ '%.2f'|format(por_cobrar) }}</strong>
+    <small>{{ cuentas_pendientes }} cuenta(s) pendiente(s)</small>
+  </a>
+
+  <a class="tarjeta" href="{{ url_for('bodega.index') }}">
+    <small>Total en bodega</small>
+    <strong>{{ sacos_bodega }} sacos</strong>
+    <small>{{ clientes_con_arroz }} cliente(s) con arroz guardado</small>
+  </a>
+
+  <a class="tarjeta" href="{{ url_for('pilado.index') }}">
+    <small>Pilados de hoy</small>
+    <strong>{{ pilados_hoy }}</strong>
+    <small>{{ '%g'|format(libras_hoy) }} lb · ${{ '%.2f'|format(facturado_hoy) }}</small>
+  </a>
+
+  <div class="tarjeta">
+    <small>Cobrado hoy</small>
+    <strong>${{ '%.2f'|format(cobrado_hoy) }}</strong>
+    <small>Este mes: ${{ '%.2f'|format(cobrado_mes) }}</small>
+  </div>
+
+  <a class="tarjeta" href="{{ url_for('clientes.index') }}">
+    <small>Clientes activos</small>
+    <strong>{{ clientes_activos }}</strong>
+    <small>Ver listado</small>
+  </a>
+</div>
+
+<div class="dos-columnas">
+  <div>
+    <h2>Quién más debe</h2>
+    <table class="tabla">
+      <thead>
+        <tr><th>Cliente</th><th>Saldo</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for cliente, saldo in mayores_deudas %}
+        <tr>
+          <td>{{ cliente.nombre }}</td>
+          <td>${{ '%.2f'|format(saldo) }}</td>
+          <td><a href="{{ url_for('cobros.index', q=cliente.nombre) }}">Ver cuentas</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3">No hay deudas pendientes. ¡Todo cobrado!</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div>
+    <h2>Últimos pilados</h2>
+    <table class="tabla">
+      <thead>
+        <tr><th>Ticket</th><th>Fecha</th><th>Cliente</th><th>Total</th></tr>
+      </thead>
+      <tbody>
+        {% for p in ultimos_pilados %}
+        <tr>
+          <td><a href="{{ url_for('pilado.ticket', id=p.id) }}">PIL-{{ p.id }}</a></td>
+          <td>{{ p.fecha.strftime('%d/%m %H:%M') if p.fecha else '' }}</td>
+          <td>{{ p.cliente.nombre }}</td>
+          <td>${{ '%.2f'|format(p.total) }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">Aún no hay pilados registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
